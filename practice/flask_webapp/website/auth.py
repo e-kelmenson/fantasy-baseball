@@ -33,24 +33,30 @@ def logout():
 @auth.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'POST':
-        email = request.form.get('email')
-        firstName = request.form.get('firstName')
-        password1 = request.form.get('password1')
-        password2 = request.form.get('password2')
+        email = (request.form.get("email") or "").strip()
+        first_name = (request.form.get("firstName") or "").strip()
+        password1 = request.form.get("password1") or ""
+        password2 = request.form.get("password2") or ""
 
-        user = User.query.filter_by(email=email).first()
-        if user:
-            flash('An account with this email already exists. Please log in.', category='error')
+        if not email or not first_name or not password1 or not password2:
+            flash('Please fill out all fields.', category='error')
         elif len(email) < 4:
             flash('Email must be at least 4 characters.', category='error')
-        elif len(firstName) < 2:
+        elif len(email) > 150:
+            flash('Email must be at most 150 characters.', category='error')
+        elif len(first_name) < 2:
             flash('First name must be at least 2 characters.', category='error')
+        elif len(first_name) > 150:
+            flash('First name must be at most 150 characters.', category='error')
         elif password1 != password2:
             flash('Passwords do not match. Please try again.', category='error')
         elif len(password1) < 7:
             flash('Password must be at least 7 characters.', category='error')
+        elif User.query.filter_by(email=email).first():
+            flash('An account with this email already exists. Please log in.', category='error')
+    
         else:
-            new_user = User(email=email, first_name=firstName, password=generate_password_hash(password1, method='pbkdf2:sha256'))
+            new_user = User(email=email, first_name=first_name, password=generate_password_hash(password1, method='pbkdf2:sha256'))
             db.session.add(new_user)
             db.session.commit()
             flash('Account created successfully!', category='success')

@@ -10,9 +10,11 @@ views = Blueprint('views', __name__)
 @login_required
 def home():
     if request.method == 'POST':
-        note = request.form.get('note')
-        if len(note) < 1:
+        note = (request.form.get('note') or "").strip()
+        if not note:
             flash('Note is too short.', category='error')
+        elif len(note) > 10000:
+            flash('Note must be 10,000 characters or fewer.', category='error')
         else:
             new_note = Note(data=note, user_id=current_user.id)
             db.session.add(new_note)
@@ -21,6 +23,7 @@ def home():
     return render_template("home.html", user=current_user)
 
 @views.route('/delete-note', methods=['POST'])
+@login_required
 def delete_note():
     note = json.loads(request.data)
     noteId = note['noteId']
