@@ -58,3 +58,23 @@ def test_delete_note_requires_login(client):
 
     assert response.status_code == 302
     assert "/login" in response.location
+
+
+def test_delete_note_rejects_malformed_json(client):
+    client.post(
+        "/sign-up",
+        data={
+            "email": "delete-test@example.com",
+            "firstName": "Delete Tester",
+            "password1": "practice-password",
+            "password2": "practice-password",
+        },
+    )
+
+    response = client.post(
+        "/delete-note",
+        data="not JSON",
+        content_type="application/json",
+    )
+
+    assert response.status_code == 400
