@@ -1,2 +1,25 @@
 {% extends "base.html" %}
 {% block title %}My Roster{% endblock %}
+{% block content %}
+<h1>My Roster</h1>
+
+{% if roster_entries %}
+<ul class="list-group">
+    {% for entry in roster_entries %}
+    <li class="list-group-item">
+        <strong> {{ entry.player.name }} </strong>
+        — {{ entry.player.position }}
+        — {{ entry.player.team.name }}
+
+        <form method="POST" action="{{ url_for('roster.remove_player', entry_id=entry.id) }}">
+            <button type="submit" class="btn btn-primary btn-sm">
+                Remove from roster
+            </button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Your roster is empty. Visit <a href="{{ url_for('players.show_players') }}">Players</a> to add someone.</p>
+{% endif %}
+{% endblock %}

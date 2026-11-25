@@ -17,7 +17,10 @@ def app(tmp_path):
 
     with app.app_context():
         db.create_all()
-        yield app
+    
+    yield app
+
+    with app.app_context():
         db.session.remove()
         db.drop_all()
 
