@@ -2,9 +2,21 @@
 {% block title %}Players{% endblock %}
 {% block content %}
 <h1>Players</h1>
-<ul>
+<ul class="list-group">
     {% for player in players %}
-    <li>{{ player }}</li>
+    <li class="list-group-item">
+        <strong>{{ player.name }}</strong>
+        — {{ player.position }}
+        — {{ player.team.name }}
+
+        <form method="POST" action="{{ url_for('roster.add_player', player_id=player.id) }}">
+            <button type="submit" class="btn btn-primary btn-sm">
+                Add to roster
+            </button>
+        </form>
+    </li>
+    {% else %}
+    <li class="list-group-item">No players have been added yet.</li>
     {% endfor %}
 </ul>
 {% endblock %}

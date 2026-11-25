@@ -95,3 +95,24 @@ def test_logged_in_user_can_add_player_once(client, app):
         ).all()
 
         assert len(entries) == 1
+
+
+
+def test_players_page_shows_database_players_and_add_form(client, app):
+    with app.app_context():
+        team = Team(name="Test Team")
+        player = Player(
+            name="Sample Hitter",
+            position="OF",
+            team=team,
+        )
+        db.session.add(player)
+        db.session.commit()
+
+    response = client.get("/players")
+
+    assert response.status_code == 200
+    assert b"Sample Hitter" in response.data
+    assert b"Test Team" in response.data
+    assert b"Add to roster" in response.data
+    assert b"/roster/add/" in response.data
